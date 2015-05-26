@@ -11,6 +11,8 @@ type Ingredient struct {
 }
 
 type Recipe struct {
+	Name        string
+	PrepTime    int
 	Ingredients []Ingredient
 	Steps       []string
 }
