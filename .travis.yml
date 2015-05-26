@@ -1,0 +1,15 @@
+language: go
+
+go:
+    - 1.4
+
+before_install:
+    - go get github.com/mattn/goveralls
+
+script:
+    - go vet -x ./...
+    - go test -v ./...
+    - go test -covermode=count -coverprofile=profile.cov ./...
+
+after_script:
+    - $HOME/gopath/bin/goveralls -coverprofile=profile.cov -service=travis-ci
