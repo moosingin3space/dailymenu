@@ -38,9 +38,10 @@ type Ingredient struct {
 }
 
 type Recipe struct {
-	Name        string
-	PrepTime    int
-	Styles      []FoodStyle
+	Name         string
+	PrepTime     int
+	PrimaryStyle FoodStyle
+	//Styles      []FoodStyle
 	Size        MealSize
 	Ingredients []Ingredient
 	Steps       []string

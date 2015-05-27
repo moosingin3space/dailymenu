@@ -12,11 +12,11 @@ func (d planDay) CompatibleSizes(r1 planner.Recipe, r2 planner.Recipe) bool {
 		(r2.Size == planner.Lunch && r1.Size == planner.Dinner)
 }
 
-// No two of the same style in one day
+// No two of the same primary style in one day
 func (d planDay) CompatibleStyles(r1 planner.Recipe, r2 planner.Recipe) bool {
-	return r1.Style != r2.Style
+	return r1.PrimaryStyle != r2.PrimaryStyle
 }
 
-func New() PlanPeriod {
+func New() planner.PlanPeriod {
 	return planDay{}
 }
