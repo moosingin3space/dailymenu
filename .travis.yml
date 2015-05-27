@@ -5,11 +5,11 @@ go:
 
 before_install:
     - go get github.com/mattn/goveralls
+    - go get github.com/bradfitz/goimports
+    - go get github.com/golang/lint
 
 script:
-    - go vet -x ./...
-    - go test -v ./...
-    - go test -covermode=count -coverprofile=profile.cov ./...
+    - ./travisbuild.sh
 
 after_script:
     - $HOME/gopath/bin/goveralls -coverprofile=profile.cov -service=travis-ci
