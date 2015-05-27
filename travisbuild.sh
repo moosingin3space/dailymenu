@@ -10,11 +10,12 @@
 set -e
 
 GOLINT=$HOME/gopath/bin/golint
+GOIMPORTS=$HOME/gopath/bin/goimports
 
 # Automatic checks
-test -z "$(gofmt -l -w .     | tee /dev/stderr)"
-test -z "$(goimports -l -w . | tee /dev/stderr)"
-test -z "$($GOLINT .         | tee /dev/stderr)"
+test -z "$(gofmt -l -w .      | tee /dev/stderr)"
+test -z "$($GOIMPORTS -l -w . | tee /dev/stderr)"
+test -z "$($GOLINT .          | tee /dev/stderr)"
 go vet ./...
 go test -race ./...
 

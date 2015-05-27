@@ -6,7 +6,7 @@ go:
 before_install:
     - go get github.com/mattn/goveralls
     - go get github.com/bradfitz/goimports
-    - go get github.com/golang/lint
+    - go get github.com/golang/lint/golint
 
 script:
     - ./travisbuild.sh
