@@ -4,3 +4,4 @@
 [![Coverage Status](https://img.shields.io/coveralls/moosingin3space/dailymenu.svg)](https://coveralls.io/r/moosingin3space/dailymenu)
 
 `dailymenu` is a CLI tool and library to assist with making meal plans.
+This is a work in progress.
