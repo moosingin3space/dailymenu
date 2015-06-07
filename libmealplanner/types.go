@@ -22,11 +22,6 @@ const (
 	// TODO add other descriptors
 )
 
-type PlanPeriod interface {
-	CompatibleSizes(Recipe, Recipe) bool
-	CompatibleStyles(Recipe, Recipe) bool
-}
-
 type Amount struct {
 	Unit  string
 	Value float64
