@@ -15,8 +15,8 @@ type Recipe struct {
 type SortOrder string
 
 const (
-	Rating       = "r".(SortOrder)
-	Trendingness = "t"
+	Rating       SortOrder = "r"
+	Trendingness           = "t"
 )
 
 type Client interface {
