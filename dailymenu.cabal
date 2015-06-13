@@ -25,6 +25,7 @@ executable dailymenu
 
 test-suite tests
   ghc-options:      -Wall
+  type:             detailed-0.9
   main-is:          Tests.hs
   hs-source-dirs:   tests
   build-depends:    base >=4.7 && <4.8
