@@ -1,2 +1,3 @@
-profile.tmp
-profile.cov
+.cabal-sandbox
+cabal.sandbox.config
+dist
