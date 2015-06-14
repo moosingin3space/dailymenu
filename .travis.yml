@@ -1,15 +1,10 @@
-language: go
+language: haskell
 
-go:
-    - 1.4
-
-before_install:
-    - go get github.com/mattn/goveralls
-    - go get github.com/bradfitz/goimports
-    - go get github.com/golang/lint/golint
+ghc: 7.8
 
 script:
-    - ./travisbuild.sh
+    - cabal configure --enable-tests --enable-library-coverage && cabal build && cabal test
 
 after_script:
-    - $HOME/gopath/bin/goveralls -coverprofile=profile.cov -service=travis-ci
+    - cabal install hpc-coveralls
+    - hpc-coveralls app

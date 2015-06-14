@@ -1,5 +1,5 @@
 {# LANGUAGE OverloadedStrings, NoImplicitPrelude, DeriveGeneric,
-BangPatterns #}
+            BangPatterns #}
 
 module Food2ForkAPI ( Recipe(..)
                     , ShortRecipe(..)
@@ -63,6 +63,7 @@ instance ToRecipeId ShortRecipe where
 instance ToRecipeId Text where
     toRecipeId txt = txt
 
+<<<<<<< HEAD
 -- Endpoint URLs
 searchEndpoint :: Text
 searchEndpoint = "http://food2fork.com/api/search"
