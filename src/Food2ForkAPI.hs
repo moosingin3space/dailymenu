@@ -17,7 +17,7 @@ import Data.Text.Encoding
 import qualified Data.ByteString.Char8 as B
 import Utils
 import GHC.Generics
-import Network.HTTP.QueryString
+import Network.HTTP.Types
 
 -- A datatype representing a recipe (from the GetRecipe endpoint)
 data Recipe = Recipe { image_url :: !T.Text
@@ -75,16 +75,16 @@ instance Show SortOrder where
 
 mkSearchUrl :: B.ByteString -> B.ByteString -> SortOrder -> Int -> B.ByteString
 mkSearchUrl apiKey searchQuery sortOrder pageNumber = 
-    searchEndpoint <> "?" <> (toString $ queryString vars)
-      where vars = [("key", apiKey),
-                    ("q", searchQuery),
-                    ("sort", (B.pack $ show sortOrder)),
-                    ("page", (intToByteString pageNumber))]
+    searchEndpoint <> (renderQuery True vars)
+      where vars = [("key", Just apiKey),
+                    ("q", Just searchQuery),
+                    ("sort", Just $ B.pack $ show sortOrder),
+                    ("page", Just $ intToByteString pageNumber)]
 
 mkGetUrl :: (ToRecipeId a) => B.ByteString -> a -> B.ByteString
-mkGetUrl apiKey rId = getRecipeEndpoint <> "?" <> (toString $ queryString vars)
-    where vars = [("key", apiKey),
-                  ("rId", (toRecipeId rId))]
+mkGetUrl apiKey rId = getRecipeEndpoint <> (renderQuery True vars)
+    where vars = [("key", Just apiKey),
+                  ("rId", Just $ toRecipeId rId)]
 
 -- Searches through Food2Fork
 -- TODO
