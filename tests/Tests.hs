@@ -1,9 +1,7 @@
-{-# LANGUAGE OverloadedStrings, NoImplicitPrelude, DeriveGeneric,
-            BangPatterns #-}
+{-# LANGUAGE OverloadedStrings, DeriveGeneric, BangPatterns #-}
 
 module Tests where
 
-import ClassyPrelude
 import Test.QuickCheck (quickCheck)
 import Food2ForkAPI as F2F
 import Network.HTTP.QueryString
