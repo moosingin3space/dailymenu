@@ -14,9 +14,8 @@ import Data.Aeson
 import Data.Monoid
 import qualified Data.Text as T
 import Data.Text.Encoding
-import qualified Data.ByteString as B
-import Data.ByteString.Lazy (toStrict)
-import Data.ByteString.Builder (intDec, toLazyByteString)
+import qualified Data.ByteString.Char8 as B
+import Utils
 import GHC.Generics
 import Network.HTTP.QueryString
 
@@ -69,17 +68,18 @@ searchEndpoint = "http://food2fork.com/api/search"
 getRecipeEndpoint :: B.ByteString
 getRecipeEndpoint = "http://food2fork.com/api/get"
 
-sortOrderToString :: SortOrder -> B.ByteString
-sortOrderToString Rating = "r"
-sortOrderToString Trendingness = "t"
+
+instance Show SortOrder where
+    show Rating = "r"
+    show Trendingness = "t"
 
 mkSearchUrl :: B.ByteString -> B.ByteString -> SortOrder -> Int -> B.ByteString
 mkSearchUrl apiKey searchQuery sortOrder pageNumber = 
     searchEndpoint <> "?" <> (toString $ queryString vars)
       where vars = [("key", apiKey),
                     ("q", searchQuery),
-                    ("sort", (sortOrderToString sortOrder)),
-                    ("page", (toStrict $ toLazyByteString $ intDec pageNumber))]
+                    ("sort", (B.pack $ show sortOrder)),
+                    ("page", (intToByteString pageNumber))]
 
 mkGetUrl :: (ToRecipeId a) => B.ByteString -> a -> B.ByteString
 mkGetUrl apiKey rId = getRecipeEndpoint <> "?" <> (toString $ queryString vars)
