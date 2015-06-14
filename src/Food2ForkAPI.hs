@@ -1,9 +1,10 @@
-{# LANGUAGE OverloadedStrings, NoImplicitPrelude, DeriveGeneric,
-            BangPatterns #}
+{-# LANGUAGE OverloadedStrings, NoImplicitPrelude, DeriveGeneric,
+            BangPatterns #-}
 
 module Food2ForkAPI ( Recipe(..)
-                    , ShortRecipe(..)
-                    , SearchResult(..)
+                    , ShortRecipe(..) , SearchResult(..)
+                    , mkSearchUrl
+                    , mkGetUrl
                     , search
                     , getRecipe
                     ) where 
@@ -12,8 +13,8 @@ import ClassyPrelude
 import Control.Applicative
 import Data.Aeson
 import Data.Text
-import GHC.Generic
-import Network.HTTP.Base (urlEncodeVars)
+import GHC.Generics
+import Network.HTTP.QueryString
 
 -- A datatype representing a recipe (from the GetRecipe endpoint)
 data Recipe = Recipe { image_url :: !Text
@@ -63,7 +64,6 @@ instance ToRecipeId ShortRecipe where
 instance ToRecipeId Text where
     toRecipeId txt = txt
 
-<<<<<<< HEAD
 -- Endpoint URLs
 searchEndpoint :: Text
 searchEndpoint = "http://food2fork.com/api/search"
@@ -77,14 +77,14 @@ sortOrderToString Trendingness = "t"
 
 mkSearchUrl :: Text -> Text -> SortOrder -> Int -> Text
 mkSearchUrl apiKey searchQuery sortOrder pageNumber = 
-    searchEndpoint ++ "?" ++ (urlEncodeVars vars)
+    searchEndpoint ++ "?" ++ (queryString vars)
       where vars = [("key", apiKey),
-            ("q", searchQuery),
-            ("sort", (sortOrderToString sortOrder)),
-            ("page", pageNumber)]
+                    ("q", searchQuery),
+                    ("sort", (sortOrderToString sortOrder)),
+                    ("page", pageNumber)]
 
 mkGetUrl :: (ToRecipeId a) => Text -> a -> Text
-mkGetUrl apiKey rId = getRecipeEndpoint ++ "?" ++ (urlEncodeVars vas)
+mkGetUrl apiKey rId = getRecipeEndpoint ++ "?" ++ (queryString vas)
     where vars = [("key", apiKey),
                   ("rId", (toRecipeId rId))]
 
