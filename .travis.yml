@@ -7,4 +7,4 @@ script:
 
 after_script:
     - cabal install hpc-coveralls
-    - hpc-coveralls app
+    - hpc-coveralls tests
