@@ -9,11 +9,12 @@ module Food2ForkAPI ( Recipe(..)
                     , getRecipe
                     ) where 
 
-import Control.Monad
 import Data.Aeson
+import Data.Functor
 import Data.Monoid
 import qualified Data.Text as T
 import Data.Text.Encoding
+import qualified Data.ByteString.Lazy as BL
 import qualified Data.ByteString.Char8 as B
 import Utils
 import GHC.Generics
@@ -61,6 +62,9 @@ instance ToRecipeId B.ByteString where
 instance ToRecipeId T.Text where
     toRecipeId txt = encodeUtf8 txt
 
+-- A type for a simple HTTP GET function
+type HttpGet = B.ByteString -> IO (Maybe BL.ByteString)
+
 -- Endpoint URLs
 searchEndpoint :: B.ByteString
 searchEndpoint = "http://food2fork.com/api/search"
@@ -87,11 +91,17 @@ mkGetUrl apiKey rId = getRecipeEndpoint <> (renderQuery True vars)
                   ("rId", Just $ toRecipeId rId)]
 
 -- Searches through Food2Fork
--- TODO
-search :: B.ByteString -> B.ByteString -> SortOrder -> Int -> IO SearchResult
-search apiKey searchQuery sortOrder pageNumber = undefined
+search :: HttpGet -> B.ByteString -> B.ByteString -> SortOrder -> Int -> IO (Maybe SearchResult)
+search getter apiKey searchQuery sortOrder pageNumber = do
+    result <- getter $ mkSearchUrl apiKey searchQuery sortOrder pageNumber
+    case result of
+      Just r -> return $ decode r
+      Nothing -> return $ Nothing
 
 -- Gets a particular recipe
--- TODO
-getRecipe :: (ToRecipeId a) => B.ByteString -> a -> IO Recipe
-getRecipe apiKey rId = undefined
+getRecipe :: (ToRecipeId a) => HttpGet -> B.ByteString -> a -> IO (Maybe Recipe)
+getRecipe getter apiKey rId = do
+    result <- getter $ mkGetUrl apiKey rId
+    case result of
+      Just r -> return $ decode r
+      Nothing -> return $ Nothing
