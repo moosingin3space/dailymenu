@@ -7,6 +7,7 @@ module Food2ForkAPI ( Recipe(..)
                     , mkGetUrl
                     , search
                     , getRecipe
+                    , toRecipeId
                     ) where 
 
 import Data.Aeson
