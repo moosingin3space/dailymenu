@@ -5,6 +5,7 @@ module SpecHelper
     , module Utils
     , module QueryHelpers
     , module Network.HTTP.Types.URI
+    , module Data.String.Here
     ) where
 
 import Test.Hspec
@@ -14,3 +15,4 @@ import ArbitraryInstances()
 import Utils
 import QueryHelpers
 import Network.HTTP.Types.URI
+import Data.String.Here

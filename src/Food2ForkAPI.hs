@@ -8,6 +8,8 @@ module Food2ForkAPI ( Recipe(..)
                     , search
                     , getRecipe
                     , toRecipeId
+                    , searchEndpoint
+                    , getRecipeEndpoint
                     ) where 
 
 import Data.Aeson
@@ -29,7 +31,7 @@ data Recipe = Recipe { image_url :: !T.Text
                      , title :: !T.Text
                      , publisher :: !T.Text
                      , publisher_url :: !T.Text
-                     , social_rank :: Int
+                     , social_rank :: Double
                      , ingredients :: Maybe [T.Text]
                      } deriving (Show, Generic)
 
@@ -42,7 +44,11 @@ data SearchResult = SearchResult { count :: Int
                                  } deriving (Show, Generic)
 
 instance FromJSON SearchResult
-instance ToJSON SearchResult
+
+-- A datatype representing a get result
+data GetResult = GetResult { recipe :: Recipe
+                           } deriving (Show, Generic)
+instance FromJSON GetResult
 
 -- A datatype representing a sort order
 data SortOrder = Rating | Trendingness
@@ -104,5 +110,5 @@ getRecipe :: (ToRecipeId a) => HttpGet -> B.ByteString -> a -> IO (Maybe Recipe)
 getRecipe getter apiKey rId = do
     result <- getter $ mkGetUrl apiKey rId
     case result of
-      Just r -> return $ decode r
+      Just r -> return $ fmap recipe (decode r :: Maybe GetResult)
       Nothing -> return $ Nothing

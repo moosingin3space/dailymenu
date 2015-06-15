@@ -19,8 +19,8 @@ instance Arbitrary SortOrder where
 
 instance Arbitrary Recipe where
     arbitrary = Recipe <$> arbitrary 
-                       <*> arbitrary 
-                       <*> arbitrary 
+                       <*> arbitrary
+                       <*> arbitrary
                        <*> arbitrary
                        <*> arbitrary
                        <*> arbitrary
