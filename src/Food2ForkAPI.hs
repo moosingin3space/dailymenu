@@ -41,7 +41,7 @@ instance ToJSON Recipe
 -- A datatype representing a search result
 data SearchResult = SearchResult { count :: Int
                                  , recipes :: [Recipe]
-                                 } deriving (Generic)
+                                 } deriving (Show, Generic)
 
 instance FromJSON SearchResult
 
@@ -102,7 +102,7 @@ search :: HttpGet -> B.ByteString -> B.ByteString -> SortOrder -> Int -> IO (May
 search getter apiKey searchQuery sortOrder pageNumber = do
     result <- getter $ mkSearchUrl apiKey searchQuery sortOrder pageNumber
     case result of
-      Just r -> return $ decode r
+      Just r -> return $ (decode r :: Maybe SearchResult)
       Nothing -> return $ Nothing
 
 -- Gets a particular recipe

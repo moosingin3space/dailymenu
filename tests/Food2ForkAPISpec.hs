@@ -5,6 +5,7 @@ import SpecHelper
 import qualified Data.ByteString.Char8 as B
 import qualified Data.ByteString.Lazy as BL
 import qualified Data.Text as T
+import Data.Functor
 import Data.Text.Encoding
 import Data.Maybe
 
@@ -92,6 +93,13 @@ getDummyRecipeNothing = getRecipe httpGetterNothing dummyKey dummyId
     where dummyKey = "dummy" :: B.ByteString
           dummyId = "dummy" :: B.ByteString
 
+searchDummy :: IO (Maybe SearchResult)
+searchDummy = search httpGetter dummyKey dummyQuery dummyOrder dummyPage
+    where dummyKey = "dummy" :: B.ByteString
+          dummyQuery = "dummy" :: B.ByteString
+          dummyOrder = Rating
+          dummyPage = 1
+
 spec :: Spec
 spec = do
     describe "The search URL-generating function" $ do
@@ -118,31 +126,31 @@ spec = do
                 recipe `shouldSatisfy` isJust
             it "will return the correct image url" $ do
                 recipe <- getDummyRecipe
-                (fmap image_url recipe) `shouldBe` Just "http://static.food2fork.com/chickenturnover2_300e6667e66.jpg"
+                (image_url <$> recipe) `shouldBe` Just "http://static.food2fork.com/chickenturnover2_300e6667e66.jpg"
             it "will return the correct recipe ID" $ do
                 recipe <- getDummyRecipe
-                (fmap recipe_id recipe) `shouldBe` Just "37859"
+                (recipe_id <$> recipe) `shouldBe` Just "37859"
             it "will return the correct social rank" $ do
                 recipe <- getDummyRecipe
-                (fmap social_rank recipe) `shouldBe` Just 99.84842829206659
+                (social_rank <$> recipe) `shouldBe` Just 99.84842829206659
             it "will return the correct publisher url" $ do
                 recipe <- getDummyRecipe
-                (fmap publisher_url recipe) `shouldBe` Just "http://realsimple.com"
+                (publisher_url <$> recipe) `shouldBe` Just "http://realsimple.com"
             it "will return the correct title" $ do
                 recipe <- getDummyRecipe
-                (fmap title recipe) `shouldBe` Just "Chicken and Gruyre Turnovers"
+                (title <$> recipe) `shouldBe` Just "Chicken and Gruyre Turnovers"
             it "will return the correct publisher" $ do
                 recipe <- getDummyRecipe
-                (fmap publisher recipe) `shouldBe` Just "Real Simple"
+                (publisher <$> recipe) `shouldBe` Just "Real Simple"
             it "will return the correct f2f url" $ do
                 recipe <- getDummyRecipe
-                (fmap f2f_url recipe) `shouldBe` Just "http://food2fork.com/view/37859"
+                (f2f_url <$> recipe) `shouldBe` Just "http://food2fork.com/view/37859"
             it "will return the correct source url" $ do
                 recipe <- getDummyRecipe
-                (fmap source_url recipe) `shouldBe` Just "http://www.realsimple.com/food-recipes/browse-all-recipes/chicken-and-gruyere-turnovers-00000000052482/index.html"
+                (source_url <$> recipe) `shouldBe` Just "http://www.realsimple.com/food-recipes/browse-all-recipes/chicken-and-gruyere-turnovers-00000000052482/index.html"
             it "will return the correct ingredients" $ do
                 recipe <- getDummyRecipe
-                (fmap ingredients recipe) `shouldBe` Just [
+                (ingredients <$> recipe) `shouldBe` Just [
                     "1 1/2 cups shredded rotisserie chicken",
                     "1 1/2 cups grated Gruyre",
                     "1 cup frozen peas",
@@ -154,6 +162,32 @@ spec = do
             it "will be Nothing" $ do
                 recipe <- getDummyRecipeNothing
                 recipe `shouldSatisfy` (not . isJust)
+    describe "The search function" $ do 
+        context "when proper data is received" $ do
+            it "will not be Nothing" $ do
+                result <- searchDummy
+                result `shouldSatisfy` isJust
+            it "will return a single recipe" $ do
+                result <- searchDummy
+                (count <$> result) `shouldBe` Just 1
+            it "will return the correct publisher" $ do
+                result <- searchDummy
+                (publisher <$> head <$> recipes <$> result) `shouldBe` Just "Allrecipies.com"
+            it "will return the correct social rank" $ do
+                result <- searchDummy
+                (social_rank <$> head <$> recipes <$> result) `shouldBe` Just 99.81007979198002
+            it "will return the correct f2f url" $ do
+                result <- searchDummy
+                (f2f_url <$> head <$> recipes <$> result) `shouldBe` Just "http://food2fork.com/F2F/recipes/view/29159"
+            it "will return the correct publisher url" $ do
+                result <- searchDummy
+                (publisher_url <$> head <$> recipes <$> result) `shouldBe` Just "http://allrecipes.com"
+            it "will return the correct title" $ do
+                result <- searchDummy
+                (title <$> head <$> recipes <$> result) `shouldBe` Just "Slow-Cooker Chicken Tortilla Soup"
+            it "will return the correct source url" $ do
+                result <- searchDummy
+                (source_url <$> head <$> recipes <$> result) `shouldBe` Just "http://allrecipes.com/Recipe/Slow-Cooker-Chicken-Tortilla-Soup/Detail.aspx"
 
 main :: IO ()
 main = hspec spec
