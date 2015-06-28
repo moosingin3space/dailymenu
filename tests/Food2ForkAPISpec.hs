@@ -47,6 +47,9 @@ httpGetter url
     |]
     | otherwise = return Nothing
 
+httpGetterNothing :: B.ByteString -> IO (Maybe BL.ByteString)
+httpGetterNothing _ = return Nothing
+
 prop_recipeToRecipeIdWorks :: Recipe -> Bool
 prop_recipeToRecipeIdWorks recipe = 
     (encodeUtf8 $ recipe_id recipe) == (toRecipeId recipe)
@@ -84,6 +87,11 @@ getDummyRecipe = getRecipe httpGetter dummyKey dummyId
     where dummyKey = "dummy" :: B.ByteString
           dummyId = "dummy" :: B.ByteString
 
+getDummyRecipeNothing :: IO (Maybe Recipe)
+getDummyRecipeNothing = getRecipe httpGetterNothing dummyKey dummyId
+    where dummyKey = "dummy" :: B.ByteString
+          dummyId = "dummy" :: B.ByteString
+
 spec :: Spec
 spec = do
     describe "The search URL-generating function" $ do
@@ -103,34 +111,49 @@ spec = do
           prop_textToRecipeIdWorks
         it "work properly for a ByteString" $ property $
           prop_byteStringToRecipeIdWorks
-    describe "The getRecipe function, when returning proper data" $ do 
-        it "will not be Nothing" $ do
-            recipe <- getDummyRecipe
-            recipe `shouldSatisfy` isJust
-        it "will return the correct image url" $ do
-            recipe <- getDummyRecipe
-            (fmap image_url recipe) `shouldBe` Just "http://static.food2fork.com/chickenturnover2_300e6667e66.jpg"
-        it "will return the correct recipe ID" $ do
-            recipe <- getDummyRecipe
-            (fmap recipe_id recipe) `shouldBe` Just "37859"
-        it "will return the correct social rank" $ do
-            recipe <- getDummyRecipe
-            (fmap social_rank recipe) `shouldBe` Just 99.84842829206659
-        it "will return the correct publisher url" $ do
-            recipe <- getDummyRecipe
-            (fmap publisher_url recipe) `shouldBe` Just "http://realsimple.com"
-        it "will return the correct title" $ do
-            recipe <- getDummyRecipe
-            (fmap title recipe) `shouldBe` Just "Chicken and Gruyre Turnovers"
-        it "will return the correct publisher" $ do
-            recipe <- getDummyRecipe
-            (fmap publisher recipe) `shouldBe` Just "Real Simple"
-        it "will return the correct f2f url" $ do
-            recipe <- getDummyRecipe
-            (fmap f2f_url recipe) `shouldBe` Just "http://food2fork.com/view/37859"
-        it "will return the correct source url" $ do
-            recipe <- getDummyRecipe
-            (fmap source_url recipe) `shouldBe` Just "http://www.realsimple.com/food-recipes/browse-all-recipes/chicken-and-gruyere-turnovers-00000000052482/index.html"
+    describe "The getRecipe function" $ do 
+        context "when proper data is returned" $ do
+            it "will not be Nothing" $ do
+                recipe <- getDummyRecipe
+                recipe `shouldSatisfy` isJust
+            it "will return the correct image url" $ do
+                recipe <- getDummyRecipe
+                (fmap image_url recipe) `shouldBe` Just "http://static.food2fork.com/chickenturnover2_300e6667e66.jpg"
+            it "will return the correct recipe ID" $ do
+                recipe <- getDummyRecipe
+                (fmap recipe_id recipe) `shouldBe` Just "37859"
+            it "will return the correct social rank" $ do
+                recipe <- getDummyRecipe
+                (fmap social_rank recipe) `shouldBe` Just 99.84842829206659
+            it "will return the correct publisher url" $ do
+                recipe <- getDummyRecipe
+                (fmap publisher_url recipe) `shouldBe` Just "http://realsimple.com"
+            it "will return the correct title" $ do
+                recipe <- getDummyRecipe
+                (fmap title recipe) `shouldBe` Just "Chicken and Gruyre Turnovers"
+            it "will return the correct publisher" $ do
+                recipe <- getDummyRecipe
+                (fmap publisher recipe) `shouldBe` Just "Real Simple"
+            it "will return the correct f2f url" $ do
+                recipe <- getDummyRecipe
+                (fmap f2f_url recipe) `shouldBe` Just "http://food2fork.com/view/37859"
+            it "will return the correct source url" $ do
+                recipe <- getDummyRecipe
+                (fmap source_url recipe) `shouldBe` Just "http://www.realsimple.com/food-recipes/browse-all-recipes/chicken-and-gruyere-turnovers-00000000052482/index.html"
+            it "will return the correct ingredients" $ do
+                recipe <- getDummyRecipe
+                (fmap ingredients recipe) `shouldBe` Just [
+                    "1 1/2 cups shredded rotisserie chicken",
+                    "1 1/2 cups grated Gruyre",
+                    "1 cup frozen peas",
+                    "2 sheets (one 17.25-ounce package) frozen puff pastry, thawed",
+                    "1 large egg, beaten",
+                    "1/4 cup Dijon mustard\n"
+                    ]
+        context "when improper data is received" $ do
+            it "will be Nothing" $ do
+                recipe <- getDummyRecipeNothing
+                recipe `shouldSatisfy` (not . isJust)
 
 main :: IO ()
 main = hspec spec

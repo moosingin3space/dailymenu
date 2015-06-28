@@ -32,7 +32,7 @@ data Recipe = Recipe { image_url :: !T.Text
                      , publisher :: !T.Text
                      , publisher_url :: !T.Text
                      , social_rank :: Double
-                     , ingredients :: Maybe [T.Text]
+                     , ingredients :: [T.Text]
                      } deriving (Show, Generic)
 
 instance FromJSON Recipe
