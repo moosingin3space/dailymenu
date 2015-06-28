@@ -41,13 +41,13 @@ instance ToJSON Recipe
 -- A datatype representing a search result
 data SearchResult = SearchResult { count :: Int
                                  , recipes :: [Recipe]
-                                 } deriving (Show, Generic)
+                                 } deriving (Generic)
 
 instance FromJSON SearchResult
 
 -- A datatype representing a get result
 data GetResult = GetResult { recipe :: Recipe
-                           } deriving (Show, Generic)
+                           } deriving (Generic)
 instance FromJSON GetResult
 
 -- A datatype representing a sort order
