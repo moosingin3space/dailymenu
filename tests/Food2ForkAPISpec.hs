@@ -16,12 +16,13 @@ httpGetter url
             "count": 1,
             "recipes": [{
                       "publisher": "Allrecipes.com",
-                      "social_rank": 99.81007979198002, 
+                      "social_rank": 99.81007979198002,
                       "f2f_url": "http://food2fork.com/F2F/recipes/view/29159",
                       "publisher_url": "http://allrecipes.com",
-                      "title": "Slow-Cooker Chicken Tortilla Soup", 
+                      "title": "Slow-Cooker Chicken Tortilla Soup",
                       "source_url": "http://allrecipes.com/Recipe/Slow-Cooker-Chicken-Tortilla-Soup/Detail.aspx",
-                      "page":1}]
+                      "page":1
+            }]
         }
     |]
     | getRecipeEndpoint `B.isPrefixOf` url = return $ Just [here|
@@ -52,8 +53,9 @@ httpGetterNothing :: B.ByteString -> IO (Maybe BL.ByteString)
 httpGetterNothing _ = return Nothing
 
 prop_recipeToRecipeIdWorks :: Recipe -> Bool
-prop_recipeToRecipeIdWorks recipe = 
-    (encodeUtf8 $ recipe_id recipe) == (toRecipeId recipe)
+prop_recipeToRecipeIdWorks recipe = case (recipe_id recipe) of
+                                      Just rId -> (encodeUtf8 rId) == (toRecipeId recipe)
+                                      Nothing -> "unknown" == (toRecipeId recipe)
 
 prop_textToRecipeIdWorks :: T.Text -> Bool
 prop_textToRecipeIdWorks txt = (encodeUtf8 txt) == (toRecipeId txt)
@@ -62,15 +64,15 @@ prop_byteStringToRecipeIdWorks :: B.ByteString -> Bool
 prop_byteStringToRecipeIdWorks bs = (id bs) == (toRecipeId bs)
 
 prop_searchUrlIsValid :: B.ByteString -> B.ByteString -> SortOrder -> Int -> Bool
-prop_searchUrlIsValid apiKey searchQuery sortOrder pageNumber = 
-    let url = mkSearchUrl apiKey searchQuery sortOrder pageNumber 
-     in (Just apiKey == apiKeyFromUrl url 
+prop_searchUrlIsValid apiKey searchQuery sortOrder pageNumber =
+    let url = mkSearchUrl apiKey searchQuery sortOrder pageNumber
+     in (Just apiKey == apiKeyFromUrl url
       && Just searchQuery == searchQueryFromUrl url
       && Just (B.pack $ show sortOrder) == sortOrderFromUrl url
       && Just (intToByteString pageNumber) == pageNumberFromUrl url)
 
 prop_getUrlIsValid :: B.ByteString -> B.ByteString -> Bool
-prop_getUrlIsValid apiKey rId = 
+prop_getUrlIsValid apiKey rId =
     let url = mkGetUrl apiKey rId
      in (Just apiKey == apiKeyFromUrl url
       && Just rId == recipeIdFromUrl url)
@@ -119,17 +121,17 @@ spec = do
           prop_textToRecipeIdWorks
         it "work properly for a ByteString" $ property $
           prop_byteStringToRecipeIdWorks
-    describe "The getRecipe function" $ do 
+    describe "The getRecipe function" $ do
         context "when proper data is returned" $ do
             it "will not be Nothing" $ do
                 recipe <- getDummyRecipe
                 recipe `shouldSatisfy` isJust
             it "will return the correct image url" $ do
                 recipe <- getDummyRecipe
-                (image_url <$> recipe) `shouldBe` Just "http://static.food2fork.com/chickenturnover2_300e6667e66.jpg"
+                (image_url <$> recipe) `shouldBe` Just (Just "http://static.food2fork.com/chickenturnover2_300e6667e66.jpg")
             it "will return the correct recipe ID" $ do
                 recipe <- getDummyRecipe
-                (recipe_id <$> recipe) `shouldBe` Just "37859"
+                (recipe_id <$> recipe) `shouldBe` Just (Just "37859")
             it "will return the correct social rank" $ do
                 recipe <- getDummyRecipe
                 (social_rank <$> recipe) `shouldBe` Just 99.84842829206659
@@ -150,19 +152,19 @@ spec = do
                 (source_url <$> recipe) `shouldBe` Just "http://www.realsimple.com/food-recipes/browse-all-recipes/chicken-and-gruyere-turnovers-00000000052482/index.html"
             it "will return the correct ingredients" $ do
                 recipe <- getDummyRecipe
-                (ingredients <$> recipe) `shouldBe` Just [
+                (ingredients <$> recipe) `shouldBe` Just (Just [
                     "1 1/2 cups shredded rotisserie chicken",
                     "1 1/2 cups grated Gruyre",
                     "1 cup frozen peas",
                     "2 sheets (one 17.25-ounce package) frozen puff pastry, thawed",
                     "1 large egg, beaten",
                     "1/4 cup Dijon mustard\n"
-                    ]
+                    ])
         context "when improper data is received" $ do
             it "will be Nothing" $ do
                 recipe <- getDummyRecipeNothing
                 recipe `shouldSatisfy` (not . isJust)
-    describe "The search function" $ do 
+    describe "The search function" $ do
         context "when proper data is received" $ do
             it "will not be Nothing" $ do
                 result <- searchDummy
@@ -172,7 +174,7 @@ spec = do
                 (count <$> result) `shouldBe` Just 1
             it "will return the correct publisher" $ do
                 result <- searchDummy
-                (publisher <$> head <$> recipes <$> result) `shouldBe` Just "Allrecipies.com"
+                (publisher <$> head <$> recipes <$> result) `shouldBe` Just "Allrecipes.com"
             it "will return the correct social rank" $ do
                 result <- searchDummy
                 (social_rank <$> head <$> recipes <$> result) `shouldBe` Just 99.81007979198002

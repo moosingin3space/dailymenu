@@ -10,7 +10,7 @@ module Food2ForkAPI ( Recipe(..)
                     , toRecipeId
                     , searchEndpoint
                     , getRecipeEndpoint
-                    ) where 
+                    ) where
 
 import Data.Aeson
 import Data.Functor
@@ -24,15 +24,15 @@ import GHC.Generics
 import Network.HTTP.Types
 
 -- A datatype representing a recipe (from the GetRecipe endpoint)
-data Recipe = Recipe { image_url :: !T.Text
+data Recipe = Recipe { image_url :: Maybe T.Text
                      , source_url :: !T.Text
                      , f2f_url :: !T.Text
-                     , recipe_id :: !T.Text
+                     , recipe_id :: Maybe T.Text
                      , title :: !T.Text
                      , publisher :: !T.Text
                      , publisher_url :: !T.Text
                      , social_rank :: Double
-                     , ingredients :: [T.Text]
+                     , ingredients :: Maybe [T.Text]
                      } deriving (Show, Generic)
 
 instance FromJSON Recipe
@@ -59,7 +59,9 @@ class ToRecipeId a where
 
 -- An instance of ToRecipeId for a ShortRecipe
 instance ToRecipeId Recipe where
-    toRecipeId shortRecipe = encodeUtf8 $ recipe_id shortRecipe
+    toRecipeId shortRecipe = case (recipe_id shortRecipe) of
+                               Just rId -> encodeUtf8 rId
+                               Nothing -> "unknown"
 
 -- An instance of ToRecipeId for a B.ByteString
 instance ToRecipeId B.ByteString where
@@ -85,7 +87,7 @@ instance Show SortOrder where
     show Trendingness = "t"
 
 mkSearchUrl :: B.ByteString -> B.ByteString -> SortOrder -> Int -> B.ByteString
-mkSearchUrl apiKey searchQuery sortOrder pageNumber = 
+mkSearchUrl apiKey searchQuery sortOrder pageNumber =
     searchEndpoint <> (renderQuery True vars)
       where vars = [("key", Just apiKey),
                     ("q", Just searchQuery),
