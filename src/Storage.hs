@@ -15,7 +15,7 @@ rootDirectory :: IO FilePath
 rootDirectory = Dir.getAppUserDataDirectory "dailymenu"
 
 underscoreize :: T.Text -> T.Text
-underscoreize = T.replace " " "__"
+underscoreize = T.replace " " "_-_"
 
 getFileName :: F2F.Recipe -> IO FilePath
 getFileName recipe = do

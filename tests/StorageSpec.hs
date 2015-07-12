@@ -8,7 +8,7 @@ import Storage
 
 prop_underscoreize_reverseable :: T.Text -> Bool
 prop_underscoreize_reverseable text =
-    T.replace "__" " " (underscoreize text) == text
+    T.replace "_-_" " " (underscoreize text) == text
 
 spec :: Spec
 spec = do
