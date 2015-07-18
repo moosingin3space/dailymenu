@@ -1,6 +1,7 @@
 module Main where
 
 import Options.Applicative
+import qualified Data.Text as T
 
 data Timeframe = Day | Week
 
@@ -18,6 +19,10 @@ data Options = Options Command
 data Command = Search SearchOptions
              | Save SaveOptions
              | Plan PlanOptions
+
+-- TODO
+f2fApiKey :: T.Text
+f2fApiKey = T.pack ""
 
 searchOptions :: Parser Command
 searchOptions = Search <$> (SearchOptions
