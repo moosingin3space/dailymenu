@@ -2,6 +2,10 @@ module Main where
 
 import Options.Applicative
 import qualified Data.Text as T
+import qualified Data.ByteString.Char8 as B
+import qualified Data.ByteString.Lazy as BL
+import qualified Food2ForkAPI as F2F
+import Network.HTTP.Conduit
 
 data Timeframe = Day | Week
 
@@ -21,8 +25,13 @@ data Command = Search SearchOptions
              | Plan PlanOptions
 
 -- TODO
-f2fApiKey :: T.Text
-f2fApiKey = T.pack ""
+f2fApiKey :: B.ByteString
+f2fApiKey = B.pack ""
+
+httpGetter :: B.ByteString -> IO (Maybe BL.ByteString)
+httpGetter url = do
+    response <- simpleHttp $ show url
+    return $ Just response
 
 searchOptions :: Parser Command
 searchOptions = Search <$> (SearchOptions
@@ -47,7 +56,11 @@ options = Options
 
 -- TODO
 runApp :: Options -> IO ()
-runApp (Options (Search opt)) = undefined
+runApp (Options (Search opt)) = do
+    results <- search
+    print $ show $ F2F.recipes <$> results
+      where
+          search = F2F.search httpGetter f2fApiKey (B.pack (optQuery opt)) F2F.Rating 1
 runApp (Options (Save opt))= undefined
 runApp (Options (Plan opt)) = undefined
 runApp _ = return ()
