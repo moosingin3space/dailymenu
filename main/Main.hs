@@ -30,7 +30,7 @@ f2fApiKey = B.pack ""
 
 httpGetter :: B.ByteString -> IO (Maybe BL.ByteString)
 httpGetter url = do
-    response <- simpleHttp $ show url
+    response <- simpleHttp $ B.unpack url
     return $ Just response
 
 searchOptions :: Parser Command
