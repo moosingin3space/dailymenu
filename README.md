@@ -9,4 +9,4 @@
 able to produce a list of meals to have each day in addition to a list of
 ingredients to purchase at weekly shopping trips.
 
-This integrates with the Food2Fork API to provide recipe search.
+*In need of an API to integrate with! F2F's API appears to be defunct.*
